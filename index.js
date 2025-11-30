@@ -86,6 +86,36 @@ app.get("/jobs", async (req, res) => {
   }
 });
 
+// 3. Fetch a single job posting
+const fetchJobById = async (jobId) => {
+  try {
+    const job = await InternHouseJobs.findById(jobId);
+    return job;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+app.get("/jobs/:jobId", async (req, res) => {
+  try {
+    const job = await fetchJobById(req.params.jobId);
+
+    if (!job) {
+      return res.status(404).json({ message: "❌ Job not found." });
+    }
+
+    return res.status(200).json({
+      message: "✅ Successfully fetched job by Id.",
+      job: job,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "❌ Failed to fetch job posting by Id.",
+      error: error.message,
+    });
+  }
+});
+
 // 3. Delete a job posting
 const deleteJobById = async (jobId) => {
   try {
@@ -109,12 +139,10 @@ app.delete("/jobs/:jobId", async (req, res) => {
       deletedJob: deletedJob,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "❌ Failed to delete job posting by Id.",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "❌ Failed to delete job posting by Id.",
+      error: error.message,
+    });
   }
 });
 
